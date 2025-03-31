@@ -119,8 +119,8 @@ if __name__ == "__main__":
     bt.logging.debug("Starting auto updater...")
 
     # Get the path to the precog directory
-    with pkg_resources.path(prec, ".") as p:
-        git_repo_path = p
+    # with pkg_resources.path(prec, ".") as p:
+    #     git_repo_path = p
 
     git_repo_path = Path.cwd()
     
