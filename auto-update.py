@@ -8,10 +8,6 @@ from git.exc import GitCommandError
 from pathlib import Path
 
 
-# Frequency of the auto updater in minutes
-TIME_INTERVAL = 5
-
-
 def git_apply_stash(repo: git.Repo, old_commit_hash: str) -> bool:
 
     try:
@@ -94,13 +90,14 @@ def main(path) -> bool:
     # If we could not pull
     if not pull_success:
 
-        # TODO: End the pm2 process?
+        # TODO: Setup pagerduty
         pass
 
     # If we pulled successfully but had to rollback
     elif not stash_success:
+        # TODO: Setup pagerduty
         raise RuntimeError(
-            "Local changes are not compatible with new commits observed on GitHub. Manual intervention to update the code is required. Killing the auto updater pm2 process."
+            "Local changes are not compatible with new commits observed on GitHub. Manual intervention to update the code is required."
         )
 
     # Pull and stash succeeded
@@ -118,28 +115,16 @@ if __name__ == "__main__":
     bt.logging.set_debug()
     bt.logging.debug("Starting auto updater...")
 
-    # Get the path to the precog directory
-    # with pkg_resources.path(prec, ".") as p:
-    #     git_repo_path = p
-
     git_repo_path = Path.cwd()
-    
 
     bt.logging.debug("Checking for repository changes...")
 
     # Pull the latest changes from github
     has_changed = main(git_repo_path)
 
-    # If the repo has not changed
     if not has_changed:
-        bt.logging.debug("Repository has not changed. Sleep mode activated.")
+        bt.logging.debug("Repository has not changed!")
+        # TODO: Add call to restart function
 
-    # If the repository has changed
     else:
         bt.logging.debug("Repository has changed!")
-
-        # We can now restart both pm2 processes, including the auto updater
-        # bt.logging.debug("Installing dependencies...")
-        # subprocess.run(["poetry", "install"], cwd=git_repo_path)
-        # bt.logging.debug("Restarting pm2 processes...")
-        # subprocess.run(["pm2", "restart", "app.config.js"], cwd=git_repo_path)
