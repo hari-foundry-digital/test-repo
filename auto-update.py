@@ -2,6 +2,7 @@ import subprocess
 import time
 import bittensor as bt
 import git
+import argparse
 from git.exc import GitCommandError
 from pathlib import Path
 
@@ -110,15 +111,14 @@ def main(path) -> bool:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Git status checker")
+    parser.add_argument("repo_path", type=str, help="Path to the Git repository")
+    args = parser.parse_args()
+
     bt.logging.set_debug()
-    bt.logging.debug("Starting auto updater...")
+    bt.logging.debug("Starting update checks...")
 
-    git_repo_path = Path.cwd()
-
-    bt.logging.debug("Checking for repository changes...")
-
-    # Pull the latest changes from github
-    has_changed = main(git_repo_path)
+    has_changed = main(args.repo_path)
 
     if not has_changed:
         bt.logging.debug("Repository has not changed!")
